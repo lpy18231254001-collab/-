@@ -12,16 +12,21 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
       - name: Unzip project
         run: |
           unzip -q *.zip -d project
-          G=$(find project -name gradlew | head -n 1)
-          echo "PROJ_DIR=$(dirname "$G")" >> $GITHUB_ENV
+          S=$(find project -name settings.gradle | head -n 1)
+          echo "PROJ_DIR=$(dirname "$S")" >> $GITHUB_ENV
       - name: Build debug APK
         run: |
           cd "$PROJ_DIR"
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          gradle assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
