@@ -12,11 +12,18 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Unzip project
+        run: |
+          unzip -q *.zip -d project
+          G=$(find project -name gradlew | head -n 1)
+          echo "PROJ_DIR=$(dirname "$G")" >> $GITHUB_ENV
       - name: Build debug APK
-        run: chmod +x gradlew && ./gradlew assembleDebug
+        run: |
+          cd "$PROJ_DIR"
+          chmod +x gradlew
+          ./gradlew assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DailyCheckin-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
+          name: app-debug
+          path: project/**/build/outputs/apk/debug/*.apk
